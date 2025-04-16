@@ -1,4 +1,3 @@
-
 import { User, Restaurant, Rating, BeerRating } from '../types';
 
 // Dados de mock para desenvolvimento
@@ -21,17 +20,29 @@ export const mockRestaurants: Restaurant[] = [
   {
     id: '1',
     name: 'Sabores da Terra',
-    code: '123456'
+    code: '123456',
+    fixedDish: {
+      name: 'Feijoada Completa',
+      photoUrl: 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9'
+    }
   },
   {
     id: '2',
     name: 'Cantina Italiana',
-    code: '654321'
+    code: '654321',
+    fixedDish: {
+      name: 'Risoto de Funghi',
+      photoUrl: 'https://images.unsplash.com/photo-1582562124811-c09040d0a901'
+    }
   },
   {
     id: '3',
     name: 'Tempero Mineiro',
-    code: '987654'
+    code: '987654',
+    fixedDish: {
+      name: 'Feijão Tropeiro',
+      photoUrl: 'https://images.unsplash.com/photo-1466721591366-2d5fba72006d'
+    }
   }
 ];
 

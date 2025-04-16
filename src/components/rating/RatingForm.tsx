@@ -1,5 +1,4 @@
-
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,9 +7,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
 import { Restaurant, Rating, BeerRating } from '@/types';
 import StarRating from './StarRating';
-import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CRAFT_BEERS } from '@/utils/constants';
+import { Separator } from "@/components/ui/separator";
+import { Input } from '@/components/ui/input';
 import { Image, Upload } from 'lucide-react';
 
 interface RatingFormProps {
@@ -18,53 +18,28 @@ interface RatingFormProps {
 }
 
 const RatingForm: React.FC<RatingFormProps> = ({ restaurant }) => {
-  const [dishRating, setDishRating] = useState(3);
   const [serviceRating, setServiceRating] = useState(3);
   const [cleanlinessRating, setCleanlinessRating] = useState(3);
   const [beerRating, setBeerRating] = useState(3);
   const [beerName, setBeerName] = useState<(typeof CRAFT_BEERS)[number]>(CRAFT_BEERS[0]);
-  const [dishName, setDishName] = useState('');
-  const [dishPhoto, setDishPhoto] = useState<string | undefined>();
   const [activeTab, setActiveTab] = useState<'food' | 'beer'>('food');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setDishPhoto(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   const handleFoodSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-
-    if (!dishName.trim()) {
-      toast({
-        variant: "destructive",
-        title: "Nome do prato obrigatório",
-        description: "Por favor, informe o nome do prato avaliado."
-      });
-      setIsSubmitting(false);
-      return;
-    }
 
     setTimeout(() => {
       const rating: Rating = {
         id: Date.now().toString(),
         userId: JSON.parse(localStorage.getItem('currentUser') || '{}').id || '1',
         restaurantId: restaurant.id,
-        dishName,
-        dishPhoto,
-        dishRating,
+        dishName: restaurant.fixedDish.name,
+        dishPhoto: restaurant.fixedDish.photoUrl,
+        dishRating: 5,
         serviceRating,
         cleanlinessRating,
         date: new Date().toISOString().split('T')[0]
@@ -126,69 +101,21 @@ const RatingForm: React.FC<RatingFormProps> = ({ restaurant }) => {
           <TabsContent value="food">
             <form onSubmit={handleFoodSubmit} className="space-y-6">
               <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="dishName">Nome do Prato</Label>
-                  <Input
-                    id="dishName"
-                    placeholder="Ex: Feijoada, Risoto de Camarão"
-                    value={dishName}
-                    onChange={(e) => setDishName(e.target.value)}
-                    required
+                <div className="border rounded-lg p-4 bg-muted/20">
+                  <h3 className="text-lg font-medium mb-2">{restaurant.fixedDish.name}</h3>
+                  <img 
+                    src={restaurant.fixedDish.photoUrl} 
+                    alt={restaurant.fixedDish.name}
+                    className="w-full h-48 object-cover rounded-md"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Foto do Prato</Label>
-                  <div className="flex items-center gap-4">
-                    {dishPhoto ? (
-                      <div className="relative w-24 h-24">
-                        <img
-                          src={dishPhoto}
-                          alt={dishName}
-                          className="w-full h-full object-cover rounded-md"
-                        />
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon"
-                          className="absolute -top-2 -right-2"
-                          onClick={() => setDishPhoto(undefined)}
-                        >
-                          ✕
-                        </Button>
-                      </div>
-                    ) : (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => fileInputRef.current?.click()}
-                        className="h-24 w-24"
-                      >
-                        <div className="flex flex-col items-center gap-1">
-                          <Upload className="h-6 w-6" />
-                          <span className="text-xs">Upload</span>
-                        </div>
-                      </Button>
-                    )}
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleImageUpload}
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="dishRating">Avaliação do Prato</Label>
-                  <StarRating value={dishRating} onChange={setDishRating} />
-                </div>
-                
-                <div className="space-y-2">
                   <Label htmlFor="serviceRating">Atendimento</Label>
                   <StarRating value={serviceRating} onChange={setServiceRating} />
                 </div>
+                
+                <Separator className="my-4" />
                 
                 <div className="space-y-2">
                   <Label htmlFor="cleanlinessRating">Limpeza</Label>

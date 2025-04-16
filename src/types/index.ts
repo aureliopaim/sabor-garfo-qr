@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   name?: string;
@@ -6,10 +5,16 @@ export interface User {
   identifier: string; // CPF ou telefone
 }
 
+interface FixedDish {
+  name: string;
+  photoUrl: string;
+}
+
 export interface Restaurant {
   id: string;
   name: string;
-  code: string; // código de 6 dígitos
+  code: string;
+  fixedDish: FixedDish;
 }
 
 export interface Rating {
