@@ -1,50 +1,75 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
 import { Restaurant, Rating, BeerRating } from '@/types';
+import StarRating from './StarRating';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { CRAFT_BEERS } from '@/utils/constants';
+import { Image, Upload } from 'lucide-react';
 
 interface RatingFormProps {
   restaurant: Restaurant;
 }
 
 const RatingForm: React.FC<RatingFormProps> = ({ restaurant }) => {
-  // Estados para as avaliações
   const [dishRating, setDishRating] = useState(3);
   const [serviceRating, setServiceRating] = useState(3);
   const [cleanlinessRating, setCleanlinessRating] = useState(3);
   const [beerRating, setBeerRating] = useState(3);
-  const [beerName, setBeerName] = useState('');
+  const [beerName, setBeerName] = useState<(typeof CRAFT_BEERS)[number]>(CRAFT_BEERS[0]);
+  const [dishName, setDishName] = useState('');
+  const [dishPhoto, setDishPhoto] = useState<string | undefined>();
   const [activeTab, setActiveTab] = useState<'food' | 'beer'>('food');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setDishPhoto(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleFoodSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simular envio da avaliação
+    if (!dishName.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Nome do prato obrigatório",
+        description: "Por favor, informe o nome do prato avaliado."
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
     setTimeout(() => {
-      // Em uma aplicação real, isso seria enviado ao backend
       const rating: Rating = {
         id: Date.now().toString(),
         userId: JSON.parse(localStorage.getItem('currentUser') || '{}').id || '1',
         restaurantId: restaurant.id,
+        dishName,
+        dishPhoto,
         dishRating,
         serviceRating,
         cleanlinessRating,
         date: new Date().toISOString().split('T')[0]
       };
 
-      // Armazenar avaliação no localStorage (mock de persistência)
       const ratings = JSON.parse(localStorage.getItem('ratings') || '[]');
       localStorage.setItem('ratings', JSON.stringify([...ratings, rating]));
 
@@ -61,20 +86,7 @@ const RatingForm: React.FC<RatingFormProps> = ({ restaurant }) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Validação do nome da cerveja
-    if (!beerName.trim()) {
-      toast({
-        variant: "destructive",
-        title: "Nome da cerveja obrigatório",
-        description: "Por favor, informe o nome da cerveja avaliada."
-      });
-      setIsSubmitting(false);
-      return;
-    }
-
-    // Simular envio da avaliação de cerveja
     setTimeout(() => {
-      // Em uma aplicação real, isso seria enviado ao backend
       const beerRatingObj: BeerRating = {
         id: Date.now().toString(),
         userId: JSON.parse(localStorage.getItem('currentUser') || '{}').id || '1',
@@ -84,7 +96,6 @@ const RatingForm: React.FC<RatingFormProps> = ({ restaurant }) => {
         date: new Date().toISOString().split('T')[0]
       };
 
-      // Armazenar avaliação no localStorage (mock de persistência)
       const beerRatings = JSON.parse(localStorage.getItem('beerRatings') || '[]');
       localStorage.setItem('beerRatings', JSON.stringify([...beerRatings, beerRatingObj]));
 
@@ -116,48 +127,72 @@ const RatingForm: React.FC<RatingFormProps> = ({ restaurant }) => {
             <form onSubmit={handleFoodSubmit} className="space-y-6">
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <Label htmlFor="dishRating">Prato {dishRating}/5</Label>
-                    <span className="text-xl">{['😕', '🙂', '😀', '😋', '🤩'][dishRating-1]}</span>
-                  </div>
-                  <Slider
-                    id="dishRating"
-                    min={1}
-                    max={5}
-                    step={1}
-                    value={[dishRating]}
-                    onValueChange={(value) => setDishRating(value[0])}
+                  <Label htmlFor="dishName">Nome do Prato</Label>
+                  <Input
+                    id="dishName"
+                    placeholder="Ex: Feijoada, Risoto de Camarão"
+                    value={dishName}
+                    onChange={(e) => setDishName(e.target.value)}
+                    required
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Foto do Prato</Label>
+                  <div className="flex items-center gap-4">
+                    {dishPhoto ? (
+                      <div className="relative w-24 h-24">
+                        <img
+                          src={dishPhoto}
+                          alt={dishName}
+                          className="w-full h-full object-cover rounded-md"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          className="absolute -top-2 -right-2"
+                          onClick={() => setDishPhoto(undefined)}
+                        >
+                          ✕
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="h-24 w-24"
+                      >
+                        <div className="flex flex-col items-center gap-1">
+                          <Upload className="h-6 w-6" />
+                          <span className="text-xs">Upload</span>
+                        </div>
+                      </Button>
+                    )}
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleImageUpload}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="dishRating">Avaliação do Prato</Label>
+                  <StarRating value={dishRating} onChange={setDishRating} />
                 </div>
                 
                 <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <Label htmlFor="serviceRating">Atendimento {serviceRating}/5</Label>
-                    <span className="text-xl">{['😕', '🙂', '😀', '😋', '🤩'][serviceRating-1]}</span>
-                  </div>
-                  <Slider
-                    id="serviceRating"
-                    min={1}
-                    max={5}
-                    step={1}
-                    value={[serviceRating]}
-                    onValueChange={(value) => setServiceRating(value[0])}
-                  />
+                  <Label htmlFor="serviceRating">Atendimento</Label>
+                  <StarRating value={serviceRating} onChange={setServiceRating} />
                 </div>
                 
                 <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <Label htmlFor="cleanlinessRating">Limpeza {cleanlinessRating}/5</Label>
-                    <span className="text-xl">{['😕', '🙂', '😀', '😋', '🤩'][cleanlinessRating-1]}</span>
-                  </div>
-                  <Slider
-                    id="cleanlinessRating"
-                    min={1}
-                    max={5}
-                    step={1}
-                    value={[cleanlinessRating]}
-                    onValueChange={(value) => setCleanlinessRating(value[0])}
-                  />
+                  <Label htmlFor="cleanlinessRating">Limpeza</Label>
+                  <StarRating value={cleanlinessRating} onChange={setCleanlinessRating} />
                 </div>
               </div>
               
@@ -175,29 +210,24 @@ const RatingForm: React.FC<RatingFormProps> = ({ restaurant }) => {
             <form onSubmit={handleBeerSubmit} className="space-y-6">
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="beerName">Nome da Cerveja Artesanal</Label>
-                  <Input
-                    id="beerName"
-                    placeholder="Ex: IPA Dourada, Stout Chocolate"
-                    value={beerName}
-                    onChange={(e) => setBeerName(e.target.value)}
-                    required
-                  />
+                  <Label htmlFor="beerName">Cerveja Artesanal</Label>
+                  <Select value={beerName} onValueChange={(value: (typeof CRAFT_BEERS)[number]) => setBeerName(value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione a cerveja" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CRAFT_BEERS.map((beer) => (
+                        <SelectItem key={beer} value={beer}>
+                          {beer}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 
                 <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <Label htmlFor="beerRating">Avaliação {beerRating}/5</Label>
-                    <span className="text-xl">{['😕', '🙂', '😀', '😋', '🤩'][beerRating-1]}</span>
-                  </div>
-                  <Slider
-                    id="beerRating"
-                    min={1}
-                    max={5}
-                    step={1}
-                    value={[beerRating]}
-                    onValueChange={(value) => setBeerRating(value[0])}
-                  />
+                  <Label htmlFor="beerRating">Avaliação</Label>
+                  <StarRating value={beerRating} onChange={setBeerRating} />
                 </div>
               </div>
               

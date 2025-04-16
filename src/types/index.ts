@@ -16,6 +16,8 @@ export interface Rating {
   id: string;
   userId: string;
   restaurantId: string;
+  dishName: string;
+  dishPhoto?: string;
   dishRating: number;
   serviceRating: number;
   cleanlinessRating: number;
@@ -26,7 +28,7 @@ export interface BeerRating {
   id: string;
   userId: string;
   restaurantId: string;
-  beerName?: string;
+  beerName: (typeof import('../utils/constants').CRAFT_BEERS)[number];
   rating: number;
   date: string;
 }

@@ -1,7 +1,7 @@
-
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Star } from 'lucide-react';
 import { Rating, BeerRating } from '@/types';
 import { mockRatings, mockBeerRatings, mockRestaurants } from '@/utils/mockData';
 
@@ -11,7 +11,6 @@ const RatingHistory = () => {
   const [activeTab, setActiveTab] = useState<'food' | 'beer'>('food');
 
   useEffect(() => {
-    // Carregar dados do localStorage ou usar mock se não existirem
     const storedRatings = localStorage.getItem('ratings');
     const storedBeerRatings = localStorage.getItem('beerRatings');
     
@@ -29,15 +28,19 @@ const RatingHistory = () => {
     return new Intl.DateTimeFormat('pt-BR').format(date);
   };
 
-  // Renderizar ícones de avaliação baseados na nota
   const renderRatingStars = (rating: number) => {
-    return Array(5)
-      .fill(0)
-      .map((_, i) => (
-        <span key={i} className={`text-sm ${i < rating ? 'text-gastro-orange' : 'text-gray-300'}`}>
-          ★
-        </span>
-      ));
+    return (
+      <div className="flex gap-0.5">
+        {Array(5).fill(0).map((_, i) => (
+          <Star
+            key={i}
+            className={`w-4 h-4 ${
+              i < rating ? "fill-gastro-orange stroke-gastro-orange" : "stroke-gastro-orange fill-transparent"
+            }`}
+          />
+        ))}
+      </div>
+    );
   };
 
   return (
@@ -67,29 +70,39 @@ const RatingHistory = () => {
                     key={rating.id} 
                     className="p-4 border rounded-md hover:bg-muted/50 transition-colors"
                   >
-                    <div className="flex justify-between items-start">
-                      <div>
+                    <div className="flex gap-4">
+                      {rating.dishPhoto && (
+                        <img
+                          src={rating.dishPhoto}
+                          alt={rating.dishName}
+                          className="w-24 h-24 object-cover rounded-md"
+                        />
+                      )}
+                      <div className="flex-1">
                         <h3 className="font-semibold text-gastro-brown">
-                          {getRestaurantName(rating.restaurantId)}
+                          {rating.dishName}
                         </h3>
+                        <p className="text-sm text-muted-foreground">
+                          {getRestaurantName(rating.restaurantId)}
+                        </p>
                         <p className="text-sm text-muted-foreground">
                           {formatDate(rating.date)}
                         </p>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-3 gap-2 mt-3">
-                      <div>
-                        <p className="text-xs text-muted-foreground">Prato</p>
-                        <div className="flex">{renderRatingStars(rating.dishRating)}</div>
-                      </div>
-                      <div>
-                        <p className="text-xs text-muted-foreground">Atendimento</p>
-                        <div className="flex">{renderRatingStars(rating.serviceRating)}</div>
-                      </div>
-                      <div>
-                        <p className="text-xs text-muted-foreground">Limpeza</p>
-                        <div className="flex">{renderRatingStars(rating.cleanlinessRating)}</div>
+                        
+                        <div className="grid grid-cols-3 gap-2 mt-3">
+                          <div>
+                            <p className="text-xs text-muted-foreground">Prato</p>
+                            {renderRatingStars(rating.dishRating)}
+                          </div>
+                          <div>
+                            <p className="text-xs text-muted-foreground">Atendimento</p>
+                            {renderRatingStars(rating.serviceRating)}
+                          </div>
+                          <div>
+                            <p className="text-xs text-muted-foreground">Limpeza</p>
+                            {renderRatingStars(rating.cleanlinessRating)}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -110,7 +123,7 @@ const RatingHistory = () => {
                     key={beerRating.id} 
                     className="p-4 border rounded-md hover:bg-muted/50 transition-colors"
                   >
-                    <div className="flex justify-between">
+                    <div className="flex justify-between items-start">
                       <div>
                         <h3 className="font-semibold text-gastro-brown">
                           {beerRating.beerName}
@@ -122,9 +135,7 @@ const RatingHistory = () => {
                           {formatDate(beerRating.date)}
                         </p>
                       </div>
-                      <div className="flex">
-                        {renderRatingStars(beerRating.rating)}
-                      </div>
+                      {renderRatingStars(beerRating.rating)}
                     </div>
                   </div>
                 ))}
