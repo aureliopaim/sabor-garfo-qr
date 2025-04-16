@@ -1,0 +1,76 @@
+
+import { User, Restaurant, Rating, BeerRating } from '../types';
+
+// Dados de mock para desenvolvimento
+export const mockUsers: User[] = [
+  {
+    id: '1',
+    name: 'João Silva',
+    loginType: 'cpf',
+    identifier: '123.456.789-00'
+  },
+  {
+    id: '2',
+    name: 'Maria Oliveira',
+    loginType: 'phone',
+    identifier: '(11) 99999-8888'
+  }
+];
+
+export const mockRestaurants: Restaurant[] = [
+  {
+    id: '1',
+    name: 'Sabores da Terra',
+    code: '123456'
+  },
+  {
+    id: '2',
+    name: 'Cantina Italiana',
+    code: '654321'
+  },
+  {
+    id: '3',
+    name: 'Tempero Mineiro',
+    code: '987654'
+  }
+];
+
+export const mockRatings: Rating[] = [
+  {
+    id: '1',
+    userId: '1',
+    restaurantId: '1',
+    dishRating: 4,
+    serviceRating: 5,
+    cleanlinessRating: 4,
+    date: '2023-05-10'
+  },
+  {
+    id: '2',
+    userId: '1',
+    restaurantId: '2',
+    dishRating: 3,
+    serviceRating: 4,
+    cleanlinessRating: 5,
+    date: '2023-05-12'
+  }
+];
+
+export const mockBeerRatings: BeerRating[] = [
+  {
+    id: '1',
+    userId: '1',
+    restaurantId: '1',
+    beerName: 'IPA Dourada',
+    rating: 5,
+    date: '2023-05-10'
+  },
+  {
+    id: '2',
+    userId: '1',
+    restaurantId: '2',
+    beerName: 'Stout Chocolate',
+    rating: 4,
+    date: '2023-05-12'
+  }
+];

@@ -32,6 +32,13 @@ export default {
 					DEFAULT: 'hsl(var(--secondary))',
 					foreground: 'hsl(var(--secondary-foreground))'
 				},
+				gastro: {
+					orange: '#FF6B35',
+					brown: '#7D4F50',
+					cream: '#F7F3E3',
+					green: '#77ACA2',
+					darkBrown: '#5E3023'
+				},
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive))',
 					foreground: 'hsl(var(--destructive-foreground))'
