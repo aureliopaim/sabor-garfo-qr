@@ -24,12 +24,22 @@ const RatingPage = () => {
     // Carregar dados do restaurante atual
     const currentRestaurantStr = localStorage.getItem('currentRestaurant');
     if (!currentRestaurantStr) {
+      console.error('No restaurant data found in localStorage');
       navigate('/home');
       return;
     }
 
     try {
       const currentRestaurant = JSON.parse(currentRestaurantStr);
+      console.log('Loaded restaurant data:', currentRestaurant);
+      
+      // Ensure the restaurant has all required properties
+      if (!currentRestaurant || !currentRestaurant.id || !currentRestaurant.fixedDish) {
+        console.error('Invalid restaurant data format:', currentRestaurant);
+        navigate('/home');
+        return;
+      }
+      
       setRestaurant(currentRestaurant);
       setLoading(false);
     } catch (e) {

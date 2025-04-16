@@ -26,6 +26,28 @@ const RatingForm: React.FC<RatingFormProps> = ({ restaurant }) => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  // Make sure restaurant and restaurant.fixedDish are defined before accessing their properties
+  if (!restaurant || !restaurant.fixedDish) {
+    console.error("Restaurant or fixedDish data is missing", restaurant);
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="text-center text-xl text-gastro-brown">
+            Dados do restaurante não disponíveis
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Button 
+            className="w-full bg-gastro-orange hover:bg-gastro-darkBrown"
+            onClick={() => navigate('/home')}
+          >
+            Voltar para Home
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
   const handleFoodSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);

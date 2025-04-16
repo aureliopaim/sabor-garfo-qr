@@ -2,6 +2,7 @@
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import StarRating from './StarRating';
+import { Separator } from "@/components/ui/separator";
 
 interface ServiceRatingSectionProps {
   serviceRating: number;
@@ -22,6 +23,8 @@ const ServiceRatingSection: React.FC<ServiceRatingSectionProps> = ({
         <Label htmlFor="serviceRating">Atendimento</Label>
         <StarRating value={serviceRating} onChange={onServiceRatingChange} />
       </div>
+      
+      <Separator className="my-4" />
       
       <div className="space-y-2">
         <Label htmlFor="cleanlinessRating">Limpeza</Label>
