@@ -1,17 +1,15 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
 import { Restaurant, Rating, BeerRating } from '@/types';
-import StarRating from './StarRating';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { CRAFT_BEERS } from '@/utils/constants';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from "@/components/ui/separator";
-import { Input } from '@/components/ui/input';
-import { Image, Upload } from 'lucide-react';
+import ServiceRatingSection from './ServiceRatingSection';
+import BeerRatingSection from './BeerRatingSection';
+import { CRAFT_BEERS } from '@/utils/constants';
 
 interface RatingFormProps {
   restaurant: Restaurant;
@@ -92,6 +90,15 @@ const RatingForm: React.FC<RatingFormProps> = ({ restaurant }) => {
       </CardHeader>
       
       <CardContent>
+        <div className="border rounded-lg p-4 bg-muted/20 mb-6">
+          <h3 className="text-lg font-medium mb-2">{restaurant.fixedDish.name}</h3>
+          <img 
+            src={restaurant.fixedDish.photoUrl} 
+            alt={restaurant.fixedDish.name}
+            className="w-full h-48 object-cover rounded-md"
+          />
+        </div>
+
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'food' | 'beer')}>
           <TabsList className="grid w-full grid-cols-2 mb-4">
             <TabsTrigger value="food">Comida & Serviço</TabsTrigger>
@@ -100,28 +107,12 @@ const RatingForm: React.FC<RatingFormProps> = ({ restaurant }) => {
           
           <TabsContent value="food">
             <form onSubmit={handleFoodSubmit} className="space-y-6">
-              <div className="space-y-4">
-                <div className="border rounded-lg p-4 bg-muted/20">
-                  <h3 className="text-lg font-medium mb-2">{restaurant.fixedDish.name}</h3>
-                  <img 
-                    src={restaurant.fixedDish.photoUrl} 
-                    alt={restaurant.fixedDish.name}
-                    className="w-full h-48 object-cover rounded-md"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="serviceRating">Atendimento</Label>
-                  <StarRating value={serviceRating} onChange={setServiceRating} />
-                </div>
-                
-                <Separator className="my-4" />
-                
-                <div className="space-y-2">
-                  <Label htmlFor="cleanlinessRating">Limpeza</Label>
-                  <StarRating value={cleanlinessRating} onChange={setCleanlinessRating} />
-                </div>
-              </div>
+              <ServiceRatingSection
+                serviceRating={serviceRating}
+                cleanlinessRating={cleanlinessRating}
+                onServiceRatingChange={setServiceRating}
+                onCleanlinessRatingChange={setCleanlinessRating}
+              />
               
               <Button 
                 type="submit" 
@@ -135,28 +126,12 @@ const RatingForm: React.FC<RatingFormProps> = ({ restaurant }) => {
           
           <TabsContent value="beer">
             <form onSubmit={handleBeerSubmit} className="space-y-6">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="beerName">Cerveja Artesanal</Label>
-                  <Select value={beerName} onValueChange={(value: (typeof CRAFT_BEERS)[number]) => setBeerName(value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione a cerveja" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {CRAFT_BEERS.map((beer) => (
-                        <SelectItem key={beer} value={beer}>
-                          {beer}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="beerRating">Avaliação</Label>
-                  <StarRating value={beerRating} onChange={setBeerRating} />
-                </div>
-              </div>
+              <BeerRatingSection
+                beerName={beerName}
+                beerRating={beerRating}
+                onBeerNameChange={setBeerName}
+                onBeerRatingChange={setBeerRating}
+              />
               
               <Button 
                 type="submit" 
