@@ -1,13 +1,14 @@
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import QrScanner from 'react-qr-scanner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
-import { useToast } from '@/hooks/use-toast';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useToast } from '@/components/ui/use-toast';
 import { isValidRestaurantCode } from '@/utils/validation';
 import { mockRestaurants } from '@/utils/mockData';
-import { ScanQrCode, Code } from 'lucide-react';
 
 interface QRScannerProps {
   onScanSuccess: (restaurantCode: string) => void;
@@ -17,8 +18,8 @@ interface QRScannerProps {
 const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess }) => {
   const [scanning, setScanning] = useState(false);
   const [manualCode, setManualCode] = useState('');
-  const [activeMethod, setActiveMethod] = useState<'qr' | 'manual' | null>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleScan = (data: { text: string } | null) => {
     if (data) {
@@ -69,45 +70,19 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess }) => {
     }
   };
 
-  const resetSelection = () => {
-    setActiveMethod(null);
-    setScanning(false);
-    setManualCode('');
-  };
-
   return (
-    <Card className="w-full max-w-3xl mx-auto">
-      <CardContent className="p-6">
-        {!activeMethod ? (
-          <div className="space-y-6">
-            <h2 className="text-xl font-semibold text-center text-gastro-brown mb-6">
-              Como você deseja informar o código do restaurante?
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Button
-                onClick={() => setActiveMethod('qr')}
-                className="h-auto py-8 flex flex-col gap-4 bg-gastro-cream hover:bg-gastro-cream/90"
-              >
-                <ScanQrCode className="h-12 w-12 text-gastro-brown" />
-                <span className="text-gastro-brown font-medium">Escanear QR Code</span>
-              </Button>
-              <Button
-                onClick={() => setActiveMethod('manual')}
-                className="h-auto py-8 flex flex-col gap-4 bg-gastro-cream hover:bg-gastro-cream/90"
-              >
-                <Code className="h-12 w-12 text-gastro-brown" />
-                <span className="text-gastro-brown font-medium">Digitar Código</span>
-              </Button>
-            </div>
-          </div>
-        ) : activeMethod === 'qr' ? (
+    <Card className="p-4">
+      <CardHeader>
+        <CardTitle className="text-xl font-semibold text-center text-gastro-brown">
+          Escanear Restaurante
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="grid md:grid-cols-2 gap-4">
           <div className="space-y-4">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="font-semibold text-gastro-brown">Escaneie o QR Code</h3>
-              <Button variant="outline" onClick={resetSelection}>Voltar</Button>
-            </div>
+            <h3 className="font-medium text-center">Escanear QR Code</h3>
             {scanning ? (
-              <div className="relative w-full max-w-md mx-auto">
+              <div className="relative">
                 <QrScanner
                   delay={300}
                   onError={handleError}
@@ -128,7 +103,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess }) => {
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center space-y-4">
-                <div className="w-full max-w-md h-48 bg-muted flex items-center justify-center rounded-lg border border-dashed border-muted-foreground">
+                <div className="w-full h-48 bg-muted flex items-center justify-center rounded-lg border border-dashed border-muted-foreground">
                   <p className="text-muted-foreground text-center px-4">
                     Clique no botão abaixo para ativar a câmera
                   </p>
@@ -142,33 +117,29 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess }) => {
               </div>
             )}
           </div>
-        ) : (
+
           <div className="space-y-4">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="font-semibold text-gastro-brown">Digite o código do restaurante</h3>
-              <Button variant="outline" onClick={resetSelection}>Voltar</Button>
-            </div>
-            <div className="max-w-md mx-auto space-y-4">
+            <h3 className="font-medium text-center">Código Manual</h3>
+            <div className="space-y-2">
+              <Label htmlFor="manualCode">Código do Restaurante</Label>
               <Input
+                id="manualCode"
+                maxLength={6}
                 value={manualCode}
                 onChange={(e) => setManualCode(e.target.value.replace(/[^\d]/g, '').slice(0, 6))}
                 placeholder="Digite o código de 6 dígitos"
-                className="text-center text-xl tracking-wider"
-                maxLength={6}
               />
-              <p className="text-sm text-muted-foreground text-center">
-                Informe o código de 6 dígitos disponível no restaurante
-              </p>
-              <Button 
-                onClick={handleManualSubmit} 
-                className="w-full bg-gastro-orange hover:bg-gastro-darkBrown"
-                disabled={manualCode.length !== 6}
-              >
-                Confirmar
-              </Button>
+              <p className="text-xs text-muted-foreground">Informe o código de 6 dígitos do restaurante</p>
             </div>
+            <Button 
+              onClick={handleManualSubmit} 
+              className="w-full bg-gastro-orange hover:bg-gastro-darkBrown"
+              disabled={manualCode.length !== 6}
+            >
+              Confirmar
+            </Button>
           </div>
-        )}
+        </div>
       </CardContent>
     </Card>
   );
