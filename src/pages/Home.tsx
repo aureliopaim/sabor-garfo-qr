@@ -14,7 +14,6 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Verificar se o usuário está logado
     const currentUser = localStorage.getItem('currentUser');
     if (!currentUser) {
       navigate('/login');
@@ -24,11 +23,9 @@ const Home = () => {
   }, [navigate]);
 
   const handleScanSuccess = (restaurantCode: string) => {
-    // Verificar se o código corresponde a um restaurante
     const restaurant = mockRestaurants.find(r => r.code === restaurantCode);
     
     if (restaurant) {
-      // Armazenar o restaurante atual para a avaliação
       localStorage.setItem('currentRestaurant', JSON.stringify(restaurant));
       
       toast({
@@ -58,13 +55,10 @@ const Home = () => {
         <div className="max-w-md mx-auto space-y-6">
           <section className="text-center mb-6">
             <h2 className="text-2xl font-bold text-gastro-brown mb-2">Bem-vindo ao Circuito Gastronômico</h2>
-            <p className="text-muted-foreground">
-              Avalie os restaurantes e cervejas artesanais para contribuir com o circuito!
-            </p>
           </section>
           
           <section>
-            <QRScanner onScanSuccess={handleScanSuccess} />
+            <QRScanner onScanSuccess={handleScanSuccess} mode="combined" />
           </section>
           
           <section className="bg-muted/40 p-4 rounded-lg">
