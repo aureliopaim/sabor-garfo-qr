@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import QrScanner from 'react-qr-scanner';
@@ -74,13 +73,12 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess }) => {
     <Card className="p-4">
       <CardHeader>
         <CardTitle className="text-xl font-semibold text-center text-gastro-brown">
-          Escanear Restaurante
+          Identificar restaurante
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="space-y-4">
           <div className="space-y-4">
-            <h3 className="font-medium text-center">Escanear QR Code</h3>
             {scanning ? (
               <div className="relative">
                 <QrScanner
@@ -112,25 +110,24 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess }) => {
                   onClick={() => setScanning(true)}
                   className="bg-gastro-orange hover:bg-gastro-darkBrown"
                 >
-                  Iniciar Scanner
+                  Ler QR Code
                 </Button>
               </div>
             )}
           </div>
 
-          <div className="space-y-4">
-            <h3 className="font-medium text-center">Código Manual</h3>
-            <div className="space-y-2">
-              <Label htmlFor="manualCode">Código do Restaurante</Label>
-              <Input
-                id="manualCode"
-                maxLength={6}
-                value={manualCode}
-                onChange={(e) => setManualCode(e.target.value.replace(/[^\d]/g, '').slice(0, 6))}
-                placeholder="Digite o código de 6 dígitos"
-              />
-              <p className="text-xs text-muted-foreground">Informe o código de 6 dígitos do restaurante</p>
-            </div>
+          <div className="border-t border-muted-foreground my-4"></div>
+
+          <div className="space-y-2">
+            <Label htmlFor="manualCode">Código do Restaurante</Label>
+            <Input
+              id="manualCode"
+              maxLength={6}
+              value={manualCode}
+              onChange={(e) => setManualCode(e.target.value.replace(/[^\d]/g, '').slice(0, 6))}
+              placeholder="Digite o código de 6 dígitos"
+            />
+            <p className="text-xs text-muted-foreground">Informe o código de 6 dígitos do restaurante</p>
             <Button 
               onClick={handleManualSubmit} 
               className="w-full bg-gastro-orange hover:bg-gastro-darkBrown"
